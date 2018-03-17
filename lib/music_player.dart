@@ -10,8 +10,6 @@ enum MusicPlayerLoopKind {
 class MusicPlayer extends StatefulWidget {
   final String url;
 
-  final ImageProvider artwork;
-
   final Widget title;
 
   final Widget subtitle;
@@ -33,7 +31,6 @@ class MusicPlayer extends StatefulWidget {
   const MusicPlayer(
       {@required this.onError,
       @required this.url,
-      @required this.artwork,
       @required this.title,
       @required this.subtitle,
       this.textColor,
@@ -220,65 +217,32 @@ class MusicPlayerState extends State<MusicPlayer> {
           ],
         ),
       ),
+      new Slider(
+        onChanged: (value) {
+          if (duration != null) {
+            var seconds = duration.inSeconds * value;
+            audioPlayer.seek(seconds);
+          }
+        },
+        value: value ?? 0.0,
+        activeColor: widget.textColor,
+      ),
+      new Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 8.0,
+        ),
+        child: _time(context),
+      ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      decoration: new BoxDecoration(
-        image: new DecorationImage(
-          image: widget.artwork,
-          fit: BoxFit.cover,
-          //colorFilter: new ColorFilter.mode(color, blendMode),
-        ),
-        /*gradient: new LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              new Color.fromRGBO(104, 99, 93, 0.5),
-              new Color.fromRGBO(198, 182, 156, 0.5),
-              Colors.white,
-            ],
-          ),*/
-      ),
-      child: new Padding(
-        padding: const EdgeInsets.only(
-          bottom: 48.0,
-        ),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            /*new Material(
-          elevation: 2.0,
-          child: widget.artwork,
-        ),*/
-            new Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                new LinearProgressIndicator(
-                  value: value,
-                ),
-                new Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  child: _time(context),
-                ),
-              ],
-            ),
-            //const Divider(color: Colors.transparent),
-            new Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: _hud(context),
-            ),
-          ],
-        ),
-      ),
+    return new Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: _hud(context),
     );
   }
 }
