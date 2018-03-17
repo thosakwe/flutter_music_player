@@ -26,10 +26,20 @@ class MusicPlayer extends StatefulWidget {
 
   final Function(String) onError;
 
+  final Function() onSkipPrevious, onSkipNext;
+
+  final Function(MusicPlayerLoopKind) onLoopChanged;
+
+  final Function(bool) onShuffleChanged;
+
   final Key key;
 
   const MusicPlayer(
       {@required this.onError,
+      @required this.onSkipPrevious,
+      @required this.onSkipNext,
+      @required this.onLoopChanged,
+      @required this.onShuffleChanged,
       @required this.url,
       @required this.title,
       @required this.subtitle,
@@ -159,7 +169,9 @@ class MusicPlayerState extends State<MusicPlayer> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             new IconButton(
-              onPressed: () {},
+              onPressed: () {
+                widget.onShuffleChanged(!widget.shuffle);
+              },
               icon: new Icon(
                 Icons.shuffle,
                 color: widget.shuffle
@@ -168,7 +180,7 @@ class MusicPlayerState extends State<MusicPlayer> {
               ),
             ),
             new IconButton(
-              onPressed: () {},
+              onPressed: widget.onSkipPrevious,
               icon: new Icon(
                 Icons.skip_previous,
                 size: 32.0,
@@ -197,7 +209,7 @@ class MusicPlayerState extends State<MusicPlayer> {
               ),
             ),
             new IconButton(
-              onPressed: () {},
+              onPressed: widget.onSkipNext,
               icon: new Icon(
                 Icons.skip_next,
                 size: 32.0,
@@ -205,7 +217,17 @@ class MusicPlayerState extends State<MusicPlayer> {
               ),
             ),
             new IconButton(
-              onPressed: () {},
+              onPressed: () {
+                var loopKind;
+
+                if (widget.loop == MusicPlayerLoopKind.loopAll)
+                  loopKind = null;
+                else if (widget.loop == null)
+                  loopKind = MusicPlayerLoopKind.loopOne;
+                else if (widget.loop == MusicPlayerLoopKind.loopOne)
+                  loopKind = MusicPlayerLoopKind.loopAll;
+                widget.onLoopChanged(loopKind);
+              },
               icon: new Icon(
                   widget.loop == MusicPlayerLoopKind.loopOne
                       ? Icons.repeat_one
