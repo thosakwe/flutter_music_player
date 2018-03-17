@@ -75,6 +75,15 @@ class _MusicPlayerExampleState extends State<MusicPlayerExample> {
                     ),
                   );
             },
+            onSkipPrevious: () {},
+            onSkipNext: () {},
+            onCompleted: () {},
+            onLoopChanged: (loop) {
+              setState(() => this.loopKind = loop);
+            },
+            onShuffleChanged: (loop) {
+              setState(() => this.shuffle = loop);
+            },
             key: musicPlayerKey,
             textColor: Colors.white,
             loop: loopKind,

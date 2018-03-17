@@ -2,40 +2,73 @@ import 'package:audioplayers/audioplayer.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
+/// The kind of looping a [MusicPlayer] is doing.
 enum MusicPlayerLoopKind {
+  /// Plays the entire album/playlist again once it finishes.
+  ///
+  /// [MusicPlayer] has no logic to handle this case.
   loopAll,
+
+  /// Repeats the current when it finishes.
+  ///
+  /// [MusicPlayer] has no logic to handle this case.
   loopOne,
 }
 
+/// A Flutter widget that plays an audio file, as well as displaying
+/// a interactive HUD.
+///
+/// Supports seeking, shuffling, skipping, and more.
 class MusicPlayer extends StatefulWidget {
+  /// The URL of the audio file to play.
   final String url;
 
+  /// The title of the song being currently played.
   final Widget title;
 
+  /// Additional text to display underneath the [title], i.e. an album title.
   final Widget subtitle;
 
+  /// Passed to [AudioPlayer].
   final bool isLocal;
 
+  /// Toggles the `shuffle` state of the player.
+  ///
+  /// This is purely visual; shuffling logic should be handled by your app.
   final bool shuffle;
 
+  /// The color to paint the icons, text, and slider with.
   final Color textColor;
 
+  /// Whether the player is looping, and if so, which type of loop.
   final MusicPlayerLoopKind loop;
 
+  /// The volume to play the file at.
   final double volume;
 
+  /// Called when an error occurs.
   final Function(String) onError;
 
-  final Function() onSkipPrevious, onSkipNext;
+  /// Playback event handlers.
+  final Function() onCompleted, onSkipPrevious, onSkipNext;
 
+  /// Called when [loop] changes.
   final Function(MusicPlayerLoopKind) onLoopChanged;
 
+  /// Called when [shuffle] changes.
   final Function(bool) onShuffleChanged;
+
+  /// The minimum amount of time allowed to pass before pressing the `skip_previous` button will
+  /// restart the current song, rather than skipping back to a previous one.
+  ///
+  /// Default: `3 seconds`.
+  final Duration minRestartDuration;
 
   final Key key;
 
   const MusicPlayer(
       {@required this.onError,
+      @required this.onCompleted,
       @required this.onSkipPrevious,
       @required this.onSkipNext,
       @required this.onLoopChanged,
@@ -43,6 +76,7 @@ class MusicPlayer extends StatefulWidget {
       @required this.url,
       @required this.title,
       @required this.subtitle,
+      this.minRestartDuration: const Duration(seconds: 3),
       this.textColor,
       this.isLocal: false,
       this.volume: 1.0,
@@ -72,6 +106,7 @@ class MusicPlayerState extends State<MusicPlayer> {
         isLocal: widget.isLocal,
         volume: widget.volume,
       )
+      ..setCompletionHandler(widget.onCompleted)
       ..setErrorHandler(widget.onError)
       ..setDurationHandler((duration) {
         setState(() {
@@ -180,7 +215,12 @@ class MusicPlayerState extends State<MusicPlayer> {
               ),
             ),
             new IconButton(
-              onPressed: widget.onSkipPrevious,
+              onPressed: () {
+                if (position == null || position < widget.minRestartDuration)
+                  widget.onSkipPrevious();
+                else
+                  audioPlayer.seek(0.0);
+              },
               icon: new Icon(
                 Icons.skip_previous,
                 size: 32.0,
@@ -220,12 +260,12 @@ class MusicPlayerState extends State<MusicPlayer> {
               onPressed: () {
                 var loopKind;
 
-                if (widget.loop == MusicPlayerLoopKind.loopAll)
+                if (widget.loop == MusicPlayerLoopKind.loopOne)
                   loopKind = null;
                 else if (widget.loop == null)
-                  loopKind = MusicPlayerLoopKind.loopOne;
-                else if (widget.loop == MusicPlayerLoopKind.loopOne)
                   loopKind = MusicPlayerLoopKind.loopAll;
+                else if (widget.loop == MusicPlayerLoopKind.loopAll)
+                  loopKind = MusicPlayerLoopKind.loopOne;
                 widget.onLoopChanged(loopKind);
               },
               icon: new Icon(
