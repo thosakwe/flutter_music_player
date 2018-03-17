@@ -1,4 +1,5 @@
 # music_player
+![Fullscreen screenshot](screenshots/fullscreen.png)
 
 A new flutter package project.
 
