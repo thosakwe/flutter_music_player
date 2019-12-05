@@ -1,3 +1,8 @@
+# This is an example
+I currently have no plans of putting this on Pub. Originally, I did, but I lost interest. However, I think this is a good example, so I'm keeping it up.
+
+**That being said, the license is AGPL. Please know what that means, and don't be a pirate. I will find you.**
+
 # music_player
 ![Fullscreen screenshot](screenshots/fullscreen.png)
 
